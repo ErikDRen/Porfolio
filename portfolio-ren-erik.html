@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ren Erik — C#/C++ Developer</title>
+<style>
+:root{
+  --bg:#121419;
+  --panel:#1a1d24;
+  --panel-2:#20242c;
+  --grid:#262b34;
+  --text:#e8e9ec;
+  --muted:#8b919c;
+  --cyan:#4fd6c8;
+  --orange:#ff8a4c;
+  --mono:'JetBrains Mono','Courier New',monospace;
+  --sans:'Inter',-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.6;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none;}
+
+/* grid backdrop */
+.grid-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:48px 48px;
+  opacity:.5;
+  mask-image:radial-gradient(ellipse 80% 60% at 50% 20%, black 40%, transparent 90%);
+}
+
+/* nav */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 40px;
+  background:rgba(18,20,25,.75);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--grid);
+}
+.logo{
+  font-family:var(--mono);
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:.5px;
+  color:var(--cyan);
+}
+.logo span{color:var(--muted);}
+nav ul{display:flex;gap:32px;list-style:none;}
+nav a{
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--muted);
+  position:relative;
+  padding:4px 0;
+  transition:color .2s;
+}
+nav a::before{content:'> ';color:var(--orange);opacity:0;transition:opacity .2s;}
+nav a:hover{color:var(--text);}
+nav a:hover::before{opacity:1;}
+
+/* hero */
+.hero{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:0 40px;
+  max-width:1100px;
+  margin:0 auto;
+}
+.hero-tag{
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--cyan);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:18px;
+  display:flex;align-items:center;gap:10px;
+}
+.hero-tag::before{
+  content:'';
+  width:8px;height:8px;border-radius:50%;
+  background:var(--cyan);
+  box-shadow:0 0 12px var(--cyan);
+  animation:pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero h1{
+  font-size:clamp(40px,7vw,86px);
+  font-weight:800;
+  line-height:1.02;
+  letter-spacing:-2px;
+  margin-bottom:24px;
+}
+.hero h1 .accent{color:var(--orange);}
+.hero p{
+  max-width:560px;
+  color:var(--muted);
+  font-size:18px;
+  margin-bottom:36px;
+}
+.hero-stack{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:44px;
+}
+.chip{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:7px 14px;
+  border:1px solid var(--grid);
+  border-radius:4px;
+  color:var(--muted);
+  background:var(--panel);
+}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;}
+.btn{
+  font-family:var(--mono);
+  font-size:14px;
+  padding:13px 26px;
+  border-radius:4px;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:transform .2s, box-shadow .2s;
+}
+.btn-primary{
+  background:var(--cyan);
+  color:#0c1411;
+  font-weight:700;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,214,200,.25);}
+.btn-ghost{
+  border:1px solid var(--grid);
+  color:var(--text);
+}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange);}
+
+.coords{
+  position:absolute;
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--grid);
+}
+.coords.tl{top:90px;left:40px;}
+.coords.br{bottom:30px;right:40px;color:var(--grid);}
+
+/* section shell */
+section{
+  position:relative;z-index:1;
+  max-width:1100px;
+  margin:0 auto;
+  padding:120px 40px;
+}
+.section-head{
+  display:flex;
+  align-items:baseline;
+  gap:18px;
+  margin-bottom:56px;
+  border-bottom:1px solid var(--grid);
+  padding-bottom:20px;
+}
+.section-num{
+  font-family:var(--mono);
+  color:var(--orange);
+  font-size:14px;
+}
+.section-head h2{
+  font-size:34px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+.section-head .file-tag{
+  margin-left:auto;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* projects grid */
+.projects{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:24px;
+}
+.card{
+  background:var(--panel);
+  border:1px solid var(--grid);
+  border-radius:6px;
+  overflow:hidden;
+  transition:border-color .25s, transform .25s;
+}
+.card:hover{border-color:var(--cyan);transform:translateY(-4px);}
+.card-viewport{
+  aspect-ratio:16/9;
+  background:
+    linear-gradient(135deg, var(--panel-2) 0%, var(--bg) 100%);
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  border-bottom:1px solid var(--grid);
+}
+.card-viewport::before{
+  content:'';
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:20px 20px;
+  opacity:.4;
+}
+.card-icon{
+  font-family:var(--mono);
+  font-size:32px;
+  color:var(--grid);
+  z-index:1;
+  font-weight:700;
+}
+.card-body{padding:18px 20px 22px;}
+.card-badge{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--cyan);
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+.card h3{
+  font-size:17px;
+  margin:8px 0 8px;
+}
+.card p{
+  font-size:13.5px;
+  color:var(--muted);
+}
+.card-note{
+  margin-top:60px;
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--muted);
+  border-left:2px solid var(--orange);
+  padding:14px 18px;
+  background:var(--panel);
+}
+
+/* project meta + media slots */
+.card-meta{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:10px;
+}
+.card-meta span{display:flex;align-items:center;gap:5px;}
+.card-meta b{color:var(--text);font-weight:600;}
+.card-team{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:14px;
+  line-height:1.5;
+}
+.media-label{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--orange);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin:16px 0 8px;
+}
+.media-slots{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(70px,1fr));
+  gap:8px;
+}
+.slot{
+  aspect-ratio:16/10;
+  border:1px dashed var(--grid);
+  border-radius:4px;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  color:var(--grid);
+  transition:border-color .2s,color .2s;
+}
+.slot:hover{border-color:var(--cyan);color:var(--cyan);}
+.slot .slot-icon{font-size:13px;font-family:var(--mono);font-weight:700;}
+.slot .slot-num{font-size:9px;font-family:var(--mono);}
+.slot.video .slot-icon::before{content:'▶';}
+.slot.image .slot-icon::before{content:'▢';}
+
+/* about */
+.about-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:50px;
+  align-items:start;
+}
+.about-grid p{
+  color:var(--muted);
+  font-size:16px;
+  margin-bottom:18px;
+}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--grid);
+  border-radius:6px;
+  padding:24px;
+}
+.panel-title{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--orange);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+.skill-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid var(--grid);
+  font-size:14px;
+}
+.skill-row:last-child{border-bottom:none;}
+.bar{
+  width:120px;height:6px;
+  background:var(--grid);
+  border-radius:3px;
+  overflow:hidden;
+}
+.bar i{display:block;height:100%;background:var(--cyan);border-radius:3px;}
+
+/* contact */
+.contact-panel{
+  background:var(--panel);
+  border:1px solid var(--grid);
+  border-radius:8px;
+  padding:50px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+}
+.contact-list{display:flex;flex-direction:column;gap:22px;}
+.contact-item{display:flex;flex-direction:column;gap:4px;}
+.contact-item .label{font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:1px;text-transform:uppercase;}
+.contact-item .value{font-size:16px;}
+.contact-item a.value:hover{color:var(--cyan);}
+.terminal{
+  background:var(--bg);
+  border:1px solid var(--grid);
+  border-radius:6px;
+  padding:20px;
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--cyan);
+}
+.terminal .line{margin-bottom:8px;color:var(--muted);}
+.terminal .line b{color:var(--text);}
+.terminal .cursor{display:inline-block;width:8px;height:14px;background:var(--cyan);animation:pulse 1s infinite;vertical-align:middle;}
+
+footer{
+  position:relative;z-index:1;
+  text-align:center;
+  padding:40px;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--grid);
+  border-top:1px solid var(--grid);
+}
+
+@media(max-width:760px){
+  header{padding:16px 20px;}
+  nav ul{gap:18px;}
+  section{padding:80px 20px;}
+  .about-grid,.contact-panel{grid-template-columns:1fr;}
+  .coords{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<header>
+  <div class="logo">RE<span>.dev</span></div>
+  <nav>
+    <ul>
+      <li><a href="#projects">projects</a></li>
+      <li><a href="#about">about</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="hero">
+  <span class="coords tl">[0,0] viewport.main</span>
+  <span class="coords br">scene loaded — ready</span>
+  <div class="hero-tag">build: stable</div>
+  <h1>Ren Erik —<br>Gameplay <span class="accent">Engineer.</span></h1>
+  <p>C# / C++ developer specialized in Unity &amp; Unreal Engine, recently graduated with a Master's in Computer Engineering, video game development track. I design immersive, interactive experiences, and also build modern web apps front to back.</p>
+  <div class="hero-stack">
+    <span class="chip">C#</span>
+    <span class="chip">C++</span>
+    <span class="chip">Unity</span>
+    <span class="chip">Unreal Engine</span>
+    <span class="chip">Web Dev</span>
+  </div>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="#projects">View projects →</a>
+    <a class="btn btn-ghost" href="https://github.com/ErikDRen">GitHub</a>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <h2>projects.</h2>
+    <span class="file-tag">/Assets/Projects/</span>
+  </div>
+  <div class="projects">
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">01</span></div>
+      <div class="card-body">
+        <span class="card-badge">Unreal Engine 5 · C++</span>
+        <h3>The Last Story</h3>
+        <div class="card-meta"><span>Duration: <b>14 months</b></span><span>Team: <b>6</b></span><span>Role: <b>Developer</b></span></div>
+        <div class="card-team">5 3D artists + 1 developer (myself)</div>
+        <p>A two-player split-screen co-op demo built in Unreal Engine 5 using the Online Subsystem. Each player sees a different screen and must communicate to solve puzzles together, piecing apart clues to uncover what really happened.</p>
+        <div class="media-label">Video</div>
+        <div class="media-slots">
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V1</span></div>
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V2</span></div>
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V3</span></div>
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V4</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">02</span></div>
+      <div class="card-body">
+        <span class="card-badge">Unity · C#</span>
+        <h3>Rush Karrot</h3>
+        <div class="card-meta"><span>Duration: <b>2–3 weeks</b></span><span>Team: <b>5</b></span><span>Role: <b>Project &amp; Lead Dev</b></span></div>
+        <div class="card-team">2 2D artists + 3 developers (myself as project lead &amp; lead developer)</div>
+        <p>A fast-paced 2D platformer built in Unity under tight time pressure. The focus was on gameplay feel and coordinating multiple mechanics through a lean, efficient production pipeline.</p>
+        <div class="media-label">Image</div>
+        <div class="media-slots">
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+        </div>
+        <div class="media-label">Video</div>
+        <div class="media-slots">
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V1</span></div>
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V2</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">03</span></div>
+      <div class="card-body">
+        <span class="card-badge">Unreal Engine 5 · Solo</span>
+        <h3>Little Runner</h3>
+        <div class="card-meta"><span>Duration: <b>&lt; 1 week</b></span><span>Team: <b>Solo</b></span></div>
+        <p>A solo 3D platformer made in under a week with Unreal Engine 5. Rather than focusing on simple traversal, the design centered on trap mechanics, building an experience driven by challenge and dynamic interactions.</p>
+        <div class="media-label">Image</div>
+        <div class="media-slots">
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+        </div>
+        <div class="media-label">Video</div>
+        <div class="media-slots">
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V1</span></div>
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V2</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">04</span></div>
+      <div class="card-body">
+        <span class="card-badge">Unity · Freelance</span>
+        <h3>Gaz Factory Simulator</h3>
+        <div class="card-meta"><span>Duration: <b>2 weeks</b></span><span>Type: <b>Client work</b></span></div>
+        <p>A freelance simulator built for a private company over two weeks, replicating the operations of a gas plant. The build incorporated several client-requested features, with emphasis on accurate process replication, interactivity, and fitting the company's specific workflow.</p>
+        <div class="media-label">Image</div>
+        <div class="media-slots">
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+        </div>
+        <div class="media-label">Video</div>
+        <div class="media-slots">
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V1</span></div>
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V2</span></div>
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V3</span></div>
+          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V4</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">05</span></div>
+      <div class="card-body">
+        <span class="card-badge">Unity · Multiplayer</span>
+        <h3>Multi_shooter-2d</h3>
+        <div class="card-meta"><span>Type: <b>Prototype</b></span></div>
+        <p>A 2D multiplayer shooting prototype built in Unity to explore networking. Using Photon/PUN, the project lays the groundwork for multiplayer gameplay: action synchronization, player interactions, and real-time state handling.</p>
+        <div class="media-label">Image</div>
+        <div class="media-slots">
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 3</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 4</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">06</span></div>
+      <div class="card-body">
+        <span class="card-badge">Unity · Visual Novel</span>
+        <h3>Undercover: Berret</h3>
+        <div class="card-meta"><span>Duration: <b>2–3 weeks</b></span><span>Team: <b>3</b></span><span>Type: <b>School project</b></span></div>
+        <div class="card-team">2 developers + 1 2D artist</div>
+        <p>A classic visual novel built in Unity as a team school project, covering all of the genre's core features: interactive dialogue, story-branching choices, and management of the different scenes and interfaces.</p>
+        <div class="media-label">Image</div>
+        <div class="media-slots">
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 3</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 4</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">07</span></div>
+      <div class="card-body">
+        <span class="card-badge">Symfony · Web</span>
+        <h3>Eshop</h3>
+        <div class="card-meta"><span>Duration: <b>1 week</b></span><span>Type: <b>School project</b></span></div>
+        <p>A simple e-commerce site built with Symfony in one week, covering the essentials: user registration and login, listing and managing items for sale, a product catalog, and a basic checkout system.</p>
+        <div class="media-label">Image</div>
+        <div class="media-slots">
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 3</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">08</span></div>
+      <div class="card-body">
+        <span class="card-badge">PHP · Web</span>
+        <h3>Forum</h3>
+        <div class="card-meta"><span>Duration: <b>1 week</b></span><span>Type: <b>School project</b></span></div>
+        <p>A PHP-based forum built in one week, featuring account creation and login, post publishing, comments, and a like system on posts.</p>
+        <div class="media-label">Image</div>
+        <div class="media-slots">
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 3</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 4</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-viewport"><span class="card-icon">09</span></div>
+      <div class="card-body">
+        <span class="card-badge">Golang · Web</span>
+        <h3>Groupie Tracker</h3>
+        <div class="card-meta"><span>Duration: <b>1 week</b></span><span>Type: <b>School project</b></span></div>
+        <p>A Golang web app that aggregates artist information from a database, letting users browse concert dates for a range of different artists.</p>
+        <div class="media-label">Image</div>
+        <div class="media-slots">
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="card-note">// each slot above is a placeholder — drop your images first, then videos, in the order shown (IMG 1, IMG 2 … then V1, V2 …) and they'll line up with the order you listed them in.</div>
+</section>
+
+<section id="about">
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <h2>about me.</h2>
+    <span class="file-tag">/Profile/readme.md</span>
+  </div>
+  <div class="about-grid">
+    <div>
+      <p>I'm a recent graduate with a Master's degree in Computer Engineering, specializing in video game development. Passionate about creating interactive experiences, I'm particularly proficient with tools like Unity and Unreal Engine, which let me design immersive, innovative projects.</p>
+      <p>I also have strong web development skills, letting me build modern, functional sites tailored to user needs. Curious and versatile, I enjoy tackling new technical challenges and continuously expanding my skills across different areas of development.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-title">Stack</div>
+      <div class="skill-row"><span>C#</span><div class="bar"><i style="width:90%"></i></div></div>
+      <div class="skill-row"><span>C++</span><div class="bar"><i style="width:80%"></i></div></div>
+      <div class="skill-row"><span>Unity</span><div class="bar"><i style="width:90%"></i></div></div>
+      <div class="skill-row"><span>Unreal Engine</span><div class="bar"><i style="width:75%"></i></div></div>
+      <div class="skill-row"><span>Web (front/back)</span><div class="bar"><i style="width:70%"></i></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <h2>contact.</h2>
+    <span class="file-tag">/Connect/</span>
+  </div>
+  <div class="contact-panel">
+    <div class="contact-list">
+      <div class="contact-item">
+        <span class="label">Email</span>
+        <a class="value" href="mailto:ren.erik.19@gmail.com">ren.erik.19@gmail.com</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Phone</span>
+        <a class="value" href="tel:+33781202833">+33 7 81 20 28 33</a>
+      </div>
+      <div class="contact-item">
+        <span class="label">Location</span>
+        <span class="value">Île-de-France / Europe</span>
+      </div>
+      <div class="contact-item">
+        <span class="label">GitHub</span>
+        <a class="value" href="https://github.com/ErikDRen" target="_blank">github.com/ErikDRen</a>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="line">$ <b>whoami</b></div>
+      <div class="line">ren_erik — gameplay &amp; web developer</div>
+      <div class="line">$ <b>status</b></div>
+      <div class="line">open to new opportunities</div>
+      <div class="line">$ <span class="cursor"></span></div>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Ren Erik — build compiled successfully</footer>
+
+</body>
+</html>
