@@ -209,6 +209,7 @@ section{
   position:relative;
   display:flex;align-items:center;justify-content:center;
   border-bottom:1px solid var(--grid);
+  overflow:hidden;
 }
 .card-viewport::before{
   content:'';
@@ -216,6 +217,86 @@ section{
   background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
   background-size:20px 20px;
   opacity:.4;
+  pointer-events:none;
+}
+.card-viewport img,
+.card-viewport video{
+  width:100%;height:100%;
+  object-fit:cover;
+  position:relative;
+  z-index:1;
+  cursor:zoom-in;
+}
+.slot img,
+.slot video{
+  cursor:zoom-in;
+}
+.expand-btn{
+  position:absolute;
+  top:4px;right:4px;
+  width:20px;height:20px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(8,9,12,.7);
+  border:1px solid var(--grid);
+  border-radius:3px;
+  color:var(--text);
+  font-size:11px;
+  cursor:pointer;
+  z-index:2;
+  transition:border-color .2s,color .2s;
+}
+.expand-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* lightbox */
+.lightbox{
+  position:fixed;inset:0;z-index:1000;
+  display:none;
+  align-items:center;justify-content:center;
+  background:rgba(8,9,12,.92);
+  backdrop-filter:blur(6px);
+  padding:60px 40px;
+  animation:fadeIn .2s ease;
+}
+.lightbox.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.lightbox-inner{
+  position:relative;
+  max-width:1200px;max-height:88vh;
+  width:100%;
+  display:flex;align-items:center;justify-content:center;
+}
+.lightbox-inner img,
+.lightbox-inner video{
+  max-width:100%;max-height:88vh;
+  width:auto;height:auto;
+  border-radius:8px;
+  border:1px solid var(--grid);
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.lightbox-close{
+  position:absolute;
+  top:-44px;right:0;
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--muted);
+  border:1px solid var(--grid);
+  border-radius:4px;
+  padding:8px 14px;
+  cursor:pointer;
+  background:var(--panel);
+  transition:color .2s,border-color .2s;
+}
+.lightbox-close:hover{color:var(--orange);border-color:var(--orange);}
+.lightbox-hint{
+  position:absolute;
+  bottom:-36px;left:0;
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--grid);
+}
+@media(max-width:760px){
+  .lightbox{padding:30px 16px;}
+  .lightbox-close{top:-38px;font-size:12px;padding:6px 12px;}
 }
 .card-icon{
   font-family:var(--mono);
@@ -284,7 +365,7 @@ section{
 }
 .slot{
   aspect-ratio:16/10;
-  border:1px dashed var(--grid);
+  border:1px solid var(--grid);
   border-radius:4px;
   background:var(--bg);
   display:flex;
@@ -294,12 +375,21 @@ section{
   gap:2px;
   color:var(--grid);
   transition:border-color .2s,color .2s;
+  overflow:hidden;
+  position:relative;
 }
 .slot:hover{border-color:var(--cyan);color:var(--cyan);}
+.slot img,
+.slot video{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+}
+.slot.empty{border-style:dashed;}
 .slot .slot-icon{font-size:13px;font-family:var(--mono);font-weight:700;}
 .slot .slot-num{font-size:9px;font-family:var(--mono);}
-.slot.video .slot-icon::before{content:'▶';}
-.slot.image .slot-icon::before{content:'▢';}
+.slot.video.empty .slot-icon::before{content:'▶';}
+.slot.image.empty .slot-icon::before{content:'▢';}
 
 /* about */
 .about-grid{
@@ -434,7 +524,8 @@ footer{
   <div class="projects">
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">01</span></div>
+      <div class="card-viewport"><img src="/ImgVid/LTS.png" alt="Rush Karrot" onclick="openLightbox('/ImgVid/LTS.png','image')"></div>
+
       <div class="card-body">
         <span class="card-badge">Unreal Engine 5 · C++</span>
         <h3>The Last Story</h3>
@@ -443,16 +534,16 @@ footer{
         <p>A two-player split-screen co-op demo built in Unreal Engine 5 using the Online Subsystem. Each player sees a different screen and must communicate to solve puzzles together, piecing apart clues to uncover what really happened.</p>
         <div class="media-label">Video</div>
         <div class="media-slots">
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V1</span></div>
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V2</span></div>
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V3</span></div>
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V4</span></div>
+          <div class="slot video"><video src="/ImgVid/LTS1.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/LTS1.mp4','video')" aria-label="Agrandir">⤢</button></div>
+          <div class="slot video"><video src="/ImgVid/LTS2.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/LTS2.mp4','video')" aria-label="Agrandir">⤢</button></div>
+          <div class="slot video"><video src="/ImgVid/LTS3.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/LTS3.mp4','video')" aria-label="Agrandir">⤢</button></div>
+          <div class="slot video"><video src="/ImgVid/Gameplay.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/Gameplay.mp4','video')" aria-label="Agrandir">⤢</button></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">02</span></div>
+      <div class="card-viewport"><img src="/ImgVid/RK.png" alt="Rush Karrot" onclick="openLightbox('/ImgVid/RK.png','image')"></div>
       <div class="card-body">
         <span class="card-badge">Unity · C#</span>
         <h3>Rush Karrot</h3>
@@ -461,18 +552,18 @@ footer{
         <p>A fast-paced 2D platformer built in Unity under tight time pressure. The focus was on gameplay feel and coordinating multiple mechanics through a lean, efficient production pipeline.</p>
         <div class="media-label">Image</div>
         <div class="media-slots">
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+          <div class="slot image"><img src="/ImgVid/RK.png" alt="Rush Karrot" onclick="openLightbox('/ImgVid/RK.png','image')"></div>
         </div>
         <div class="media-label">Video</div>
         <div class="media-slots">
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V1</span></div>
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V2</span></div>
+          <div class="slot video"><video src="/ImgVid/RK0.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/RK0.mp4','video')" aria-label="Agrandir">⤢</button></div>
+          <div class="slot video"><video src="/ImgVid/RK1.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/RK1.mp4','video')" aria-label="Agrandir">⤢</button></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">03</span></div>
+      <div class="card-viewport"><img src="/ImgVid/LR0.png" alt="Little Runner" onclick="openLightbox('/ImgVid/LR0.png','image')"></div>
       <div class="card-body">
         <span class="card-badge">Unreal Engine 5 · Solo</span>
         <h3>Little Runner</h3>
@@ -480,18 +571,18 @@ footer{
         <p>A solo 3D platformer made in under a week with Unreal Engine 5. Rather than focusing on simple traversal, the design centered on trap mechanics, building an experience driven by challenge and dynamic interactions.</p>
         <div class="media-label">Image</div>
         <div class="media-slots">
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+          <div class="slot image"><img src="/ImgVid/LR0.png" alt="Little Runner" onclick="openLightbox('/ImgVid/LR0.png','image')"></div>
         </div>
         <div class="media-label">Video</div>
         <div class="media-slots">
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V1</span></div>
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V2</span></div>
+          <div class="slot video"><video src="/ImgVid/LR1.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/LR1.mp4','video')" aria-label="Agrandir">⤢</button></div>
+          <div class="slot video"><video src="/ImgVid/LR2.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/LR2.mp4','video')" aria-label="Agrandir">⤢</button></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">04</span></div>
+      <div class="card-viewport"><img src="/ImgVid/TC0.png" alt="Gaz Factory Simulator" onclick="openLightbox('/ImgVid/TC0.png','image')"></div>
       <div class="card-body">
         <span class="card-badge">Unity · Freelance</span>
         <h3>Gaz Factory Simulator</h3>
@@ -499,20 +590,20 @@ footer{
         <p>A freelance simulator built for a private company over two weeks, replicating the operations of a gas plant. The build incorporated several client-requested features, with emphasis on accurate process replication, interactivity, and fitting the company's specific workflow.</p>
         <div class="media-label">Image</div>
         <div class="media-slots">
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
+          <div class="slot image"><img src="/ImgVid/TC0.png" alt="Gaz Factory Simulator" onclick="openLightbox('/ImgVid/TC0.png','image')"></div>
         </div>
         <div class="media-label">Video</div>
         <div class="media-slots">
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V1</span></div>
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V2</span></div>
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V3</span></div>
-          <div class="slot video"><span class="slot-icon"></span><span class="slot-num">V4</span></div>
+          <div class="slot video"><video src="/ImgVid/TC1.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/TC1.mp4','video')" aria-label="Agrandir">⤢</button></div>
+          <div class="slot video"><video src="/ImgVid/TC2.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/TC2.mp4','video')" aria-label="Agrandir">⤢</button></div>
+          <div class="slot video"><video src="/ImgVid/TC3.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/TC3.mp4','video')" aria-label="Agrandir">⤢</button></div>
+          <div class="slot video"><video src="/ImgVid/TC4.mp4" controls></video><button class="expand-btn" onclick="event.stopPropagation(); openLightbox('/ImgVid/TC4.mp4','video')" aria-label="Agrandir">⤢</button></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">05</span></div>
+      <div class="card-viewport"><img src="/ImgVid/MS1.png" alt="Multi_shooter-2d" onclick="openLightbox('/ImgVid/MS1.png','image')"></div>
       <div class="card-body">
         <span class="card-badge">Unity · Multiplayer</span>
         <h3>Multi_shooter-2d</h3>
@@ -520,17 +611,17 @@ footer{
         <p>A 2D multiplayer shooting prototype built in Unity to explore networking. Using Photon/PUN, the project lays the groundwork for multiplayer gameplay: action synchronization, player interactions, and real-time state handling.</p>
         <div class="media-label">Image</div>
         <div class="media-slots">
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 3</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 4</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 5</span></div>
+          <div class="slot image"><img src="/ImgVid/MS1.png" alt="Multi_shooter-2d 1" onclick="openLightbox('/ImgVid/MS1.png','image')"></div>
+          <div class="slot image"><img src="/ImgVid/MS2.png" alt="Multi_shooter-2d 2" onclick="openLightbox('/ImgVid/MS2.png','image')"></div>
+          <div class="slot image"><img src="/ImgVid/MS3.png" alt="Multi_shooter-2d 3" onclick="openLightbox('/ImgVid/MS3.png','image')"></div>
+          <div class="slot image"><img src="/ImgVid/MS4.png" alt="Multi_shooter-2d 4" onclick="openLightbox('/ImgVid/MS4.png','image')"></div>
+          <div class="slot image"><img src="/ImgVid/MS5.png" alt="Multi_shooter-2d 5" onclick="openLightbox('/ImgVid/MS5.png','image')"></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">06</span></div>
+      <div class="card-viewport"><img src="/ImgVid/UB1.png" alt="Undercover: Berret" onclick="openLightbox('/ImgVid/UB1.png','image')"></div>
       <div class="card-body">
         <span class="card-badge">Unity · Visual Novel</span>
         <h3>Undercover: Berret</h3>
@@ -539,17 +630,17 @@ footer{
         <p>A classic visual novel built in Unity as a team school project, covering all of the genre's core features: interactive dialogue, story-branching choices, and management of the different scenes and interfaces.</p>
         <div class="media-label">Image</div>
         <div class="media-slots">
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 3</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 4</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 5</span></div>
+          <div class="slot image"><img src="/ImgVid/UB1.png" alt="Undercover: Berret 1" onclick="openLightbox('/ImgVid/UB1.png','image')"></div>
+          <div class="slot image"><img src="/ImgVid/UB2.png" alt="Undercover: Berret 2" onclick="openLightbox('/ImgVid/UB2.png','image')"></div>
+          <div class="slot image"><img src="/ImgVid/UB3.png" alt="Undercover: Berret 3" onclick="openLightbox('/ImgVid/UB3.png','image')"></div>
+          <div class="slot image"><img src="/ImgVid/UB4.png" alt="Undercover: Berret 4" onclick="openLightbox('/ImgVid/UB4.png','image')"></div>
+          <div class="slot image"><img src="/ImgVid/UB5.png" alt="Undercover: Berret 5" onclick="openLightbox('/ImgVid/UB5.png','image')"></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">07</span></div>
+      <div class="card-viewport"><img src="/ImgVid/EC.avif" alt="Eshop" onclick="openLightbox('/ImgVid/EC.avif','image')"></div>
       <div class="card-body">
         <span class="card-badge">Symfony · Web</span>
         <h3>Eshop</h3>
@@ -557,15 +648,15 @@ footer{
         <p>A simple e-commerce site built with Symfony in one week, covering the essentials: user registration and login, listing and managing items for sale, a product catalog, and a basic checkout system.</p>
         <div class="media-label">Image</div>
         <div class="media-slots">
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 3</span></div>
+          <div class="slot image"><img src="/ImgVid/EC.avif" alt="Eshop 1" onclick="openLightbox('/ImgVid/EC.avif','image')"></div>
+          <div class="slot image"><img src="/ImgVid/EC1.avif" alt="Eshop 2" onclick="openLightbox('/ImgVid/EC1.avif','image')"></div>
+          <div class="slot image"><img src="/ImgVid/EC2.avif" alt="Eshop 3" onclick="openLightbox('/ImgVid/EC2.avif','image')"></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">08</span></div>
+      <div class="card-viewport"><img src="/ImgVid/FO.avif" alt="Forum" onclick="openLightbox('/ImgVid/FO.avif','image')"></div>
       <div class="card-body">
         <span class="card-badge">PHP · Web</span>
         <h3>Forum</h3>
@@ -573,17 +664,17 @@ footer{
         <p>A PHP-based forum built in one week, featuring account creation and login, post publishing, comments, and a like system on posts.</p>
         <div class="media-label">Image</div>
         <div class="media-slots">
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 3</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 4</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 5</span></div>
+          <div class="slot image"><img src="/ImgVid/FO.avif" alt="Forum 1" onclick="openLightbox('/ImgVid/FO.avif','image')"></div>
+          <div class="slot image"><img src="/ImgVid/FO1.avif" alt="Forum 2" onclick="openLightbox('/ImgVid/FO1.avif','image')"></div>
+          <div class="slot image"><img src="/ImgVid/Fo2.avif" alt="Forum 3" onclick="openLightbox('/ImgVid/Fo2.avif','image')"></div>
+          <div class="slot image"><img src="/ImgVid/Fo3.avif" alt="Forum 4" onclick="openLightbox('/ImgVid/Fo3.avif','image')"></div>
+          <div class="slot image"><img src="/ImgVid/Fo4.avif" alt="Forum 5" onclick="openLightbox('/ImgVid/Fo4.avif','image')"></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-viewport"><span class="card-icon">09</span></div>
+      <div class="card-viewport"><img src="/ImgVid/GT.avif" alt="Groupie Tracker" onclick="openLightbox('/ImgVid/GT.avif','image')"></div>
       <div class="card-body">
         <span class="card-badge">Golang · Web</span>
         <h3>Groupie Tracker</h3>
@@ -591,14 +682,13 @@ footer{
         <p>A Golang web app that aggregates artist information from a database, letting users browse concert dates for a range of different artists.</p>
         <div class="media-label">Image</div>
         <div class="media-slots">
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 1</span></div>
-          <div class="slot image"><span class="slot-icon"></span><span class="slot-num">IMG 2</span></div>
+          <div class="slot image"><img src="/ImgVid/GT.avif" alt="Groupie Tracker 1" onclick="openLightbox('/ImgVid/GT.avif','image')"></div>
+          <div class="slot image"><img src="/ImgVid/GT1.avif" alt="Groupie Tracker 2" onclick="openLightbox('/ImgVid/GT1.avif','image')"></div>
         </div>
       </div>
     </div>
 
   </div>
-  <div class="card-note">// each slot above is a placeholder — drop your images first, then videos, in the order shown (IMG 1, IMG 2 … then V1, V2 …) and they'll line up with the order you listed them in.</div>
 </section>
 
 <section id="about">
@@ -659,6 +749,47 @@ footer{
 </section>
 
 <footer>© 2026 Ren Erik — build compiled successfully</footer>
+
+<div class="lightbox" id="lightbox" onclick="if(event.target===this) closeLightbox()">
+  <div class="lightbox-inner" id="lightboxInner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕ close</button>
+    <span class="lightbox-hint">esc / click outside to close</span>
+  </div>
+</div>
+
+<script>
+function openLightbox(src, type){
+  const inner = document.getElementById('lightboxInner');
+  const old = inner.querySelector('img, video');
+  if(old) old.remove();
+
+  let el;
+  if(type === 'video'){
+    el = document.createElement('video');
+    el.src = src;
+    el.controls = true;
+    el.autoplay = true;
+  } else {
+    el = document.createElement('img');
+    el.src = src;
+  }
+  inner.appendChild(el);
+  document.getElementById('lightbox').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(){
+  const lb = document.getElementById('lightbox');
+  const media = document.getElementById('lightboxInner').querySelector('video');
+  if(media) media.pause();
+  lb.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeLightbox();
+});
+</script>
 
 </body>
 </html>
